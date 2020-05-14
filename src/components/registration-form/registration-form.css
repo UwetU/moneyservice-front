@@ -1,17 +1,2 @@
-h1, h2, h3 {
-    text-align: center;
-}
 
-.registration--form{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-}
-
-.registration--form .ant-form{
-    width: 60%;
-    border: 1px solid #f0f0f0;
-    padding: 8px;
-}
 

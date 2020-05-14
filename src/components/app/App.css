@@ -1,2 +1,45 @@
+*{
+    margin: 0;
+    padding: 0;
+}
 
+h1, h2, h3 {
+    text-align: center;
+}
+
+.app{
+    height: 100vh;
+}
+
+.pages{
+    display: flex;
+    padding: 0 24px 24px;
+    height: 90%;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.pages .ant-form{
+    width: 60%;
+    border: 1px solid #f0f0f0;
+    padding: 8px;
+}
+
+.app .ant-form .ant-row{
+    justify-content: center;
+}
+
+.login-form-button{
+    width: 100%;
+}
+
+@media screen and (max-width: 600px) {
+    .pages {
+        padding: 8px;
+    }
+    .pages .ant-form {
+        width: 100%;
+    }
+}
 

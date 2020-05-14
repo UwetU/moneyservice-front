@@ -1,38 +1,50 @@
 import React from 'react';
 import { Form, Input, Button, Checkbox } from 'antd';
+import {Link} from "react-router-dom";
 
 import './login-form.css';
 
 const layout = {
   labelCol: {
-    span: 8,
+    span: 3,
   },
   wrapperCol: {
-    span: 16,
+    span: 9,
   },
 };
 
 const tailLayout = {
   wrapperCol: {
-    offset: 8,
-    span: 16,
+    offset: 3,
+    span: 9,
   },
 };
 
 const LoginForm = () => {
 
+  const onFinish = values => {
+    console.log('Received values of form: ', values);
+  };
+
   return (
     <Form
       {...layout}
-      name="basic"
+      name="Login"
+      className="login-form"
+      onFinish={onFinish}
       initialValues={{
         remember: true,
       }}
     >
+      <h1>Sign In</h1>
       <Form.Item
-        label="Email"
+        label="E-mail"
         name="email"
         rules={[
+          {
+            type: 'email',
+            message: 'The input is not valid E-mail!',
+          },
           {
             required: true,
             message: 'Please input your email!',
@@ -60,9 +72,10 @@ const LoginForm = () => {
       </Form.Item>
 
       <Form.Item {...tailLayout}>
-        <Button type="primary" htmlType="submit">
-          Submit
+        <Button type="primary" htmlType="submit" className="login-form-button">
+          Log In
         </Button>
+        Or <Link to="/signup">register now!</Link>
       </Form.Item>
     </Form>
   );
