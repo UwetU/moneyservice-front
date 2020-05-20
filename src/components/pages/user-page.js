@@ -1,5 +1,7 @@
 import React, { Component } from "react";
-import { Input, Layout, Button, Table, DatePicker, Select } from "antd";
+import { Input, Layout, Button, Table, DatePicker, Select, Modal } from "antd";
+import {connect} from "react-redux";
+import {userActions} from "../../actions";
 
 import "./user-page.css";
 
@@ -7,9 +9,38 @@ const { Content } = Layout;
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 
-export default class UserPage extends Component {
+class UserPage extends Component {
+
+  state = {
+    modalRefill: false,
+    modalTransfer: false,
+    accounts: [],
+    transactions: []
+  }
+
+  setModalRefillVisible(modalRefill) {
+    this.setState({ modalRefill });
+  }
+
+  setModalTransferVisible(modalRefill) {
+    this.setState({ modalRefill });
+  }
+
+  componentDidMount() {
+    this.props.getAccounts(this.props.user.id);
+    this.props.getTransactions(this.props.user.id);
+  }
+
+
+
 
   render() {
+
+    const { user, accounts, transactions } = this.props;
+
+    console.log(accounts);
+    console.log(transactions);
+
     const columns = [
       {
         title: '№ счета',
@@ -32,6 +63,7 @@ export default class UserPage extends Component {
       console.log(`selected ${value}`);
     }
 
+
     return (
     <Layout className="user-page">
       <Content className="user-information">
@@ -48,8 +80,30 @@ export default class UserPage extends Component {
               </Select>
             </div>
             <div className="account-action">
-              <Button type="primary" htmlType="submit" size="large">Пополнить</Button>
-              <Button type="primary" htmlType="submit" size="large">Перевести</Button>
+              <Button type="primary" onClick={() => this.setModalRefillVisible(true)} htmlType="submit" size="large">Пополнить</Button>
+              <Modal
+                title="Пополнение счета"
+                centered
+                visible={this.state.modalRefill}
+                onOk={() => this.setModalRefillVisible(false)}
+                onCancel={() => this.setModalRefillVisible(false)}
+              >
+                <p>some contents...</p>
+                <p>some contents...</p>
+                <p>some contents...</p>
+              </Modal>
+              <Button type="primary" onClick={() => this.setModalTransferVisible(true)} htmlType="submit" size="large">Перевести</Button>
+              <Modal
+                title="Перевод средств"
+                centered
+                visible={this.state.modalTransfer}
+                onOk={() => this.setModalTransferVisible(false)}
+                onCancel={() => this.setModalTransferVisible(false)}
+              >
+                <p>some contents...</p>
+                <p>some contents...</p>
+                <p>some contents...</p>
+              </Modal>
               <Button type="primary" htmlType="submit" size="large">Выписка</Button>
               <Button type="primary" htmlType="submit" size="large">Закрыть</Button>
             </div>
@@ -64,5 +118,20 @@ export default class UserPage extends Component {
       <div className="support-chat"></div>
     </Layout>
     );
-  };
-};
+  }
+}
+
+function mapState(state) {
+  const { auth, accounts, transactions } = state;
+  const { user } = auth;
+  return { user, accounts, transactions};
+}
+
+const actionCreators = {
+  getAccounts: userActions.getUserAccounts,
+  getTransactions: userActions.getUserTransactions
+}
+
+const connectedUserPage = connect(mapState, actionCreators)(UserPage);
+
+export { connectedUserPage as UserPage };

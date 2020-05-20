@@ -1,4 +1,6 @@
-import React from 'react';
+import React, {Component} from 'react';
+import { connect } from 'react-redux';
+import { userActions } from "../../actions";
 import {
   Form,
   Input,
@@ -40,125 +42,159 @@ const tailFormItemLayout = {
   },
 };
 
-const RegistrationForm = () => {
+class RegistrationForm extends Component{
 
-  const onFinish = values => {
-    console.log('Received values of form: ', values);
+  state = {
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: ''
   };
 
-  return (
-    <Form
-      {...formItemLayout}
-      name="register"
-      onFinish={onFinish}
-    >
-      <h1>Sign Up</h1>
-      <Form.Item
-        name="firstName"
-        label="First name"
-        rules={[
-          {
-            required: true,
-            message: 'Please input your first name!',
-            whitespace: true,
-          },
-        ]}
+  handleChange = event => {
+    this.setState({
+      [event.target.name]: event.target.value
+    });
+  };
+
+  handleSubmit = () => {
+    this.props.register(this.state);
+    console.log(this.state);
+  };
+
+  render() {
+
+    const { firstName, lastName, email, password } = this.state;
+
+    return (
+      <Form
+        {...formItemLayout}
+        name="register"
+        onFinish={this.handleSubmit}
       >
-        <Input />
-      </Form.Item>
-
-      <Form.Item
-        name="lastName"
-        label="Last name"
-        rules={[
-          {
-            required: true,
-            message: 'Please input your last name!',
-            whitespace: true,
-          },
-        ]}
-      >
-        <Input />
-      </Form.Item>
-
-      <Form.Item
-        name="email"
-        label="E-mail"
-        rules={[
-          {
-            type: 'email',
-            message: 'The input is not valid E-mail!',
-          },
-          {
-            required: true,
-            message: 'Please input your E-mail!',
-          },
-        ]}
-      >
-        <Input />
-      </Form.Item>
-
-      <Form.Item
-        name="password"
-        label="Password"
-        rules={[
-          {
-            required: true,
-            message: 'Please input your password!',
-          },
-        ]}
-        hasFeedback
-      >
-        <Input.Password />
-      </Form.Item>
-
-      <Form.Item
-        name="confirm"
-        label="Confirm Password"
-        dependencies={['password']}
-        hasFeedback
-        rules={[
-          {
-            required: true,
-            message: 'Please confirm your password!',
-          },
-          ({ getFieldValue }) => ({
-            validator(rule, value) {
-              if (!value || getFieldValue('password') === value) {
-                return Promise.resolve();
-              }
-
-              return Promise.reject('The two passwords that you entered do not match!');
+        <h1>Sign Up</h1>
+        <Form.Item
+          label="First name"
+          onChange={this.handleChange}
+          value={firstName}
+          rules={[
+            {
+              required: true,
+              message: 'Please input your first name!',
+              whitespace: true,
             },
-          }),
-        ]}
-      >
-        <Input.Password />
-      </Form.Item>
+          ]}
+        >
+          <Input name="firstName"/>
+        </Form.Item>
 
-      <Form.Item
-        name="agreement"
-        valuePropName="checked"
-        rules={[
-          {
-            validator: (_, value) =>
-              value ? Promise.resolve() : Promise.reject('Should accept agreement'),
-          },
-        ]}
-        {...tailFormItemLayout}
-      >
-        <Checkbox>
-          I have read the <a href="#">agreement</a>
-        </Checkbox>
-      </Form.Item>
-      <Form.Item {...tailFormItemLayout}>
-        <Button type="primary" htmlType="submit">
-          Register
-        </Button>
-      </Form.Item>
-    </Form>
-  );
-};
+        <Form.Item
+          label="Last name"
+          onChange={this.handleChange}
+          value={lastName}
+          rules={[
+            {
+              required: true,
+              message: 'Please input your last name!',
+              whitespace: true,
+            },
+          ]}
+        >
+          <Input name="lastName"/>
+        </Form.Item>
 
-export default RegistrationForm;
+        <Form.Item
+          label="E-mail"
+          onChange={this.handleChange}
+          value={email}
+          rules={[
+            {
+              type: 'email',
+              message: 'The input is not valid E-mail!',
+            },
+            {
+              required: true,
+              message: 'Please input your E-mail!',
+            },
+          ]}
+        >
+          <Input name="email"/>
+        </Form.Item>
+
+        <Form.Item
+          name="password"
+          label="Password"
+          onChange={this.handleChange}
+          value={password}
+          rules={[
+            {
+              required: true,
+              message: 'Please input your password!',
+            },
+          ]}
+          hasFeedback
+        >
+          <Input.Password name="password"/>
+        </Form.Item>
+
+        <Form.Item
+          name="confirm"
+          label="Confirm Password"
+          dependencies={['password']}
+          hasFeedback
+          rules={[
+            {
+              required: true,
+              message: 'Please confirm your password!',
+            },
+            ({ getFieldValue }) => ({
+              validator(rule, value) {
+                if (!value || getFieldValue('password') === value) {
+                  return Promise.resolve();
+                }
+
+                return Promise.reject('The two passwords that you entered do not match!');
+              },
+            }),
+          ]}
+        >
+          <Input.Password />
+        </Form.Item>
+
+        <Form.Item
+          name="agreement"
+          valuePropName="checked"
+          rules={[
+            {
+              validator: (_, value) =>
+                value ? Promise.resolve() : Promise.reject('Should accept agreement'),
+            },
+          ]}
+          {...tailFormItemLayout}
+        >
+          <Checkbox>
+            I have read the <a href="#">agreement</a>
+          </Checkbox>
+        </Form.Item>
+        <Form.Item {...tailFormItemLayout}>
+          <Button type="primary" htmlType="submit">
+            Register
+          </Button>
+        </Form.Item>
+      </Form>
+    );
+  }
+}
+
+function mapState(state) {
+  const { registering } = state.registration;
+  return { registering };
+}
+
+const actionCreators = {
+  register: userActions.register
+}
+
+const connectedRegisterPage = connect(mapState, actionCreators)(RegistrationForm);
+export { connectedRegisterPage as RegistrationForm };
 
