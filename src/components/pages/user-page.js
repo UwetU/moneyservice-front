@@ -1,9 +1,11 @@
 import React, { Component } from "react";
 import { Input, Layout, Button, Table, DatePicker, Select, Modal } from "antd";
-import {connect} from "react-redux";
-import {userActions} from "../../actions";
+import { connect } from "react-redux";
+import { userActions } from "../../actions";
+import FormRefill from "./form-refill";
 
 import "./user-page.css";
+import {accounts} from "../../_reducers/accounts";
 
 const { Content } = Layout;
 const { RangePicker } = DatePicker;
@@ -14,32 +16,45 @@ class UserPage extends Component {
   state = {
     modalRefill: false,
     modalTransfer: false,
-    accounts: [],
-    transactions: []
+    listAccounts: null
+  }
+
+  handleChange = value => {
+    console.log(`selected ${value}`);
   }
 
   setModalRefillVisible(modalRefill) {
     this.setState({ modalRefill });
   }
 
-  setModalTransferVisible(modalRefill) {
-    this.setState({ modalRefill });
+  setModalTransferVisible(modalTransfer) {
+    this.setState({ modalTransfer });
   }
 
   componentDidMount() {
     this.props.getAccounts(this.props.user.id);
     this.props.getTransactions(this.props.user.id);
+    if (!this.props.accounts.loading)
+      this.setState({
+        listAccount: accounts
+      });
   }
 
-
-
+  renderAccountsNumber(arr) {
+    return arr.map((account) => {
+      const {id} = account;
+      const lable = account.number;
+      return (
+        <Option key={id} value={account.number}>{lable}</Option>
+      );
+    });
+  }
 
   render() {
 
     const { user, accounts, transactions } = this.props;
 
     console.log(accounts);
-    console.log(transactions);
 
     const columns = [
       {
@@ -59,10 +74,6 @@ class UserPage extends Component {
       }
     ];
 
-    function handleChange(value) {
-      console.log(`selected ${value}`);
-    }
-
 
     return (
     <Layout className="user-page">
@@ -70,27 +81,47 @@ class UserPage extends Component {
         <h1>Информация о счете</h1>
         <div className="user-account">
           <div className="account-information">
-            <Input className="disabled-input" prefix="№" value="4567457632" disabled />
-            <Input className="disabled-input" prefix="₽" value="32445.04" suffix="RUB" disabled />
+            <Input
+              className="disabled-input"
+              prefix="№"
+              value={accounts[0] ? accounts[0].number : "У вас нет активный счетов"}
+              disabled
+            />
+            <Input
+              className="disabled-input"
+              prefix="₽"
+              value={accounts[0] ? accounts[0].balance : {}}
+              suffix="RUB"
+              disabled
+            />
             <div className="user-choose-accounts">
               <p>Выберите счет:</p>
-              <Select defaultValue="№ счета" onChange={handleChange}>
-                <Option value="4454359893">4454359893</Option>
-                <Option value="4454359893">4454359893</Option>
+              <Select
+                defaultValue={accounts[0] ? accounts[0].number : "Номер счета"}
+                onChange={this.handleChange}
+              >
+                {
+                  accounts[0] ? this.renderAccountsNumber(accounts) : <></>
+                }
               </Select>
             </div>
             <div className="account-action">
-              <Button type="primary" onClick={() => this.setModalRefillVisible(true)} htmlType="submit" size="large">Пополнить</Button>
+              <Button
+                type="primary"
+                onClick={() => this.setModalRefillVisible(true)}
+                htmlType="submit"
+                size="large"
+              >
+                Пополнить
+              </Button>
               <Modal
                 title="Пополнение счета"
                 centered
                 visible={this.state.modalRefill}
-                onOk={() => this.setModalRefillVisible(false)}
+                onOk={() => {this.setModalRefillVisible(false)}}
                 onCancel={() => this.setModalRefillVisible(false)}
               >
-                <p>some contents...</p>
-                <p>some contents...</p>
-                <p>some contents...</p>
+                <FormRefill accounts={accounts} />
               </Modal>
               <Button type="primary" onClick={() => this.setModalTransferVisible(true)} htmlType="submit" size="large">Перевести</Button>
               <Modal
